@@ -24,44 +24,55 @@ export default function App() {
   const [isQuickBookingOpen, setIsQuickBookingOpen] = useState(false);
   const [lightboxItem, setLightboxItem] = useState<PortfolioItem | null>(null);
 
+  // Support both GitHub Pages repository subpath (/Luna) and root hosting (/)
+  const getBasePrefix = (): string => {
+    const envBase = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+    if (envBase && envBase !== '/') {
+      return envBase;
+    }
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/Luna')) {
+      return '/Luna';
+    }
+    return '';
+  };
+
   // Parse path to route
   const getRouteFromPath = (path: string): PageRoute => {
-    const cleanPath = path.replace(/\/$/, '') || '/';
-    switch (cleanPath) {
-      case '/services':
+    const basePrefix = getBasePrefix();
+    let cleanPath = path;
+    if (basePrefix && cleanPath.startsWith(basePrefix)) {
+      cleanPath = cleanPath.slice(basePrefix.length);
+    }
+    cleanPath = cleanPath.replace(/\/$/, '') || '/';
+
+    // Also support hash fallback (e.g. #services or #/services)
+    const hash = typeof window !== 'undefined' ? window.location.hash.replace(/^#\/?/, '').split('?')[0] : '';
+    const candidate = (cleanPath === '/' && hash) ? hash : cleanPath.replace(/^\//, '');
+
+    switch (candidate) {
+      case 'services':
         return 'services';
-      case '/about':
+      case 'about':
         return 'about';
-      case '/portfolio':
-      case '/projects':
+      case 'portfolio':
+      case 'projects':
         return 'portfolio';
-      case '/booking':
-      case '/reserve':
+      case 'booking':
+      case 'reserve':
         return 'booking';
-      case '/contact':
+      case 'contact':
         return 'contact';
-      case '/':
+      case '':
+      case 'home':
       default:
         return 'home';
     }
   };
 
   const getPathFromRoute = (route: PageRoute): string => {
-    switch (route) {
-      case 'services':
-        return '/services';
-      case 'about':
-        return '/about';
-      case 'portfolio':
-        return '/portfolio';
-      case 'booking':
-        return '/booking';
-      case 'contact':
-        return '/contact';
-      case 'home':
-      default:
-        return '/';
-    }
+    const basePrefix = getBasePrefix();
+    const routePart = route === 'home' ? '' : `/${route}`;
+    return `${basePrefix}${routePart}` || '/';
   };
 
   // Sync with browser URL on initial load and handle browser back/forward
