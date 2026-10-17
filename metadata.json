@@ -1,0 +1,6 @@
+{
+  "name": "Luna Beauty Sanctuary Portfolio",
+  "description": "A luxury responsive portfolio and beauty sanctuary website for Luna, featuring bespoke hair, makeup, skincare, nails, bridal services, interactive lookbook gallery, and online booking concierge.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
